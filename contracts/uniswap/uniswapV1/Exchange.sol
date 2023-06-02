@@ -3,18 +3,51 @@
 pragma solidity ^0.8.18;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-contract Exchange {
+contract Exchange is ERC20 {
     IERC20 public tokenAddress;
 
-    constructor(address _token) {
+    constructor(address _token) ERC20("Uniswap-V1", "UNI-V1") {
         require(_token != address(0), "invalid token address");
 
         tokenAddress = IERC20(_token);
     }
 
-    function addLiquidity(uint256 _tokenAmount) public payable {
-        tokenAddress.transferFrom(msg.sender, address(this), _tokenAmount);
+    function addLiquidity(
+        uint256 _tokenAmount
+    ) public payable returns (uint256) {
+        if (getReserve() == 0) {
+            tokenAddress.transferFrom(msg.sender, address(this), _tokenAmount);
+            uint256 liquidity = address(this).balance;
+            _mint(msg.sender, liquidity);
+            return liquidity;
+        } else {
+            uint256 ethReserve = address(this).balance - msg.value;
+            uint256 tokenReserve = getReserve();
+            uint256 tokenAmount = (msg.value * tokenReserve) / ethReserve;
+            require(_tokenAmount >= tokenAmount, "insufficient token amount");
+            tokenAddress.transferFrom(msg.sender, address(this), tokenAmount);
+            uint256 liquidity = (msg.value * totalSupply()) / ethReserve;
+            _mint(msg.sender, liquidity);
+
+            return liquidity;
+        }
+    }
+
+    function removeLiquidity(
+        uint256 _amount
+    ) public returns (uint256, uint256) {
+        require(_amount > 0, "invalid amount");
+
+        uint256 ethAmount = (address(this).balance * _amount) / totalSupply();
+        uint256 tokenAmount = (getReserve() * _amount) / totalSupply();
+
+        _burn(msg.sender, _amount);
+        payable(msg.sender).transfer(ethAmount);
+        tokenAddress.transfer(msg.sender, tokenAmount);
+
+        return (ethAmount, tokenAmount);
     }
 
     function getReserve() public view returns (uint256) {
@@ -37,6 +70,7 @@ contract Exchange {
         return getAmount(_tokenSold, tokenReserve, address(this).balance);
     }
 
+    //   ydx / (x + dx) = dy
     function getAmount(
         uint256 inputAmount,
         uint256 inputReserve,
@@ -44,7 +78,11 @@ contract Exchange {
     ) private pure returns (uint256) {
         require(inputReserve > 0 && outputReserve > 0, "invalid reserves");
 
-        return (inputAmount * outputReserve) / (inputReserve + inputAmount);
+        uint256 inputAmountWithFee = inputAmount * 99;
+        uint256 numerator = inputAmountWithFee * outputReserve;
+        uint256 denominator = (inputReserve * 100) + inputAmountWithFee;
+
+        return numerator / denominator;
     }
 
     function ethToTokenSwap(uint256 _minTokens) public payable {
