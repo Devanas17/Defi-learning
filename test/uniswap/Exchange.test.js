@@ -106,7 +106,7 @@ describe("Exchange", () => {
 
       expect(
         fromWei(userEtherBalanceAfter.sub(userEtherBalanceBefore))
-      ).to.equal("24.99999999993602"); // 25 - gas fees
+      ).to.equal("24.99993595744765"); // 25 - gas fees
 
       expect(
         fromWei(userTokenBalanceAfter.sub(userTokenBalanceBefore))
@@ -127,7 +127,7 @@ describe("Exchange", () => {
 
       expect(
         fromWei(userEtherBalanceAfter.sub(userEtherBalanceBefore))
-      ).to.equal("99.99999999996801"); // 100 - gas fees
+      ).to.equal("99.999949098272918225"); // 100 - gas fees
 
       expect(
         fromWei(userTokenBalanceAfter.sub(userTokenBalanceBefore))
@@ -155,7 +155,7 @@ describe("Exchange", () => {
 
       expect(
         fromWei(userEtherBalanceAfter.sub(userEtherBalanceBefore))
-      ).to.equal("109.99999999996801"); // 110 - gas fees
+      ).to.equal("109.99994929982750085"); // 110 - gas fees
 
       expect(
         fromWei(userTokenBalanceAfter.sub(userTokenBalanceBefore))
@@ -184,10 +184,10 @@ describe("Exchange", () => {
       await exchange.addLiquidity(toWei(2000), { value: toWei(1000) });
 
       let tokensOut = await exchange.getTokenAmount(toWei(1));
-      expect(fromWei(tokensOut)).to.equal("1.998001998001998001");
+      expect(fromWei(tokensOut)).to.equal("1.978041738678708079");
 
       tokensOut = await exchange.getTokenAmount(toWei(100));
-      expect(fromWei(tokensOut)).to.equal("181.818181818181818181");
+      expect(fromWei(tokensOut)).to.equal("180.1637852593266606");
 
       tokensOut = await exchange.getTokenAmount(toWei(1000));
       expect(fromWei(tokensOut)).to.equal("1000.0");
@@ -200,10 +200,10 @@ describe("Exchange", () => {
       await exchange.addLiquidity(toWei(2000), { value: toWei(1000) });
 
       let ethOut = await exchange.getEthAmount(toWei(2));
-      expect(fromWei(ethOut)).to.equal("0.999000999000999");
+      expect(fromWei(ethOut)).to.equal("0.989020869339354039");
 
       ethOut = await exchange.getEthAmount(toWei(100));
-      expect(fromWei(ethOut)).to.equal("47.619047619047619047");
+      expect(fromWei(ethOut)).to.equal("47.16531681753215817");
 
       ethOut = await exchange.getEthAmount(toWei(2000));
       expect(fromWei(ethOut)).to.equal("500.0");
@@ -226,7 +226,7 @@ describe("Exchange", () => {
 
       const userBalanceAfter = await getBalance(user.address);
       expect(fromWei(userBalanceAfter.sub(userBalanceBefore))).to.equal(
-        "-1.000000000061475"
+        "-1.000061026662590145"
       );
 
       const userTokenBalance = await token.balanceOf(user.address);
@@ -290,7 +290,7 @@ describe("Exchange", () => {
 
       const userBalanceAfter = await getBalance(user.address);
       expect(fromWei(userBalanceAfter.sub(userBalanceBefore))).to.equal(
-        "0.989020869279835039"
+        "0.988961921652326754"
       );
 
       const userTokenBalance = await token.balanceOf(user.address);
