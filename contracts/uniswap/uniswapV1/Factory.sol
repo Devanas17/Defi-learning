@@ -4,13 +4,8 @@ pragma solidity ^0.8.18;
 import "./Exchange.sol";
 
 contract Factory {
-
     // tokenAddress to exchange;
-    mapping(address => address) private tokenToExchange;
-
-
-
-  
+    mapping(address => address) public tokenToExchange;
 
     function createExchange(address _tokenAddress) public returns (address) {
         require(_tokenAddress != address(0), "invalid token address");
