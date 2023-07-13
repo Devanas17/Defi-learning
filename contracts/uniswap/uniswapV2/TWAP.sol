@@ -9,17 +9,13 @@ import "@uniswap/v2-periphery/contracts/libraries/UniswapV2Library.sol";
 
 contract TWAP {
     using FixedPoint for *;
-
     uint public constant PERIOD = 10;
-
     IUniswapV2Pair public immutable pair;
     address public immutable token0;
     address public immutable token1;
-
     uint public price0CumulativeLast;
     uint public price1CumulativeLast;
     uint32 public blockTimestampLast;
-
     //  Note: binary fixed point numbers
     // range: [0, 2**112 - 1]
     // resolution: 1 / 2**112
@@ -42,17 +38,13 @@ contract TWAP {
             uint32 blockTimestamp
         ) = UniswapV2OracleLibrary.currentCumulativePrices(address(pair));
         uint32 timeElapsed = blockTimestamp - blockTimestampLast;
-
         require(timeElapsed >= PERIOD, "time elapsed < min period");
-
         price0Average = FixedPoint.uq112x112(
             uint224((price0Cumulative - price0CumulativeLast) / timeElapsed)
         );
-
         price1Average = FixedPoint.uq112x112(
             uint224((price1Cumulative - price1CumulativeLast) / timeElapsed)
         );
-
         price0CumulativeLast = price0Cumulative;
         price1CumulativeLast = price1Cumulative;
         blockTimestampLast = blockTimestamp;
@@ -63,7 +55,6 @@ contract TWAP {
         uint amountIn
     ) external view returns (uint amountOut) {
         require(token == token0 || token == token1, "invalid token");
-
         if (token == token0) {
             // NOTE: using FixedPoint for *
             // NOTE: mul returns uq144x112
